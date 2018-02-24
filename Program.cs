@@ -14,19 +14,17 @@ using Microsoft.CodeAnalysis.Text;
 
 public class Program
 {
-    static void Main() => BenchmarkRunner.Run<Program>();
-    //static void Main() => new Program().Benchmark();
+    //static void Main() => BenchmarkRunner.Run<Program>();
+    static void Main() => new Program().Benchmark();
 
-    const string RoslynDir = "C:/code/roslyn";
+    const string BaseDir = @"E:\Users\Svick\git\tunnelvisionlabs-dotnet-threading\Rackspace.Threading";
     static readonly string UserDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-    List<string> files = Directory.GetFiles($"{RoslynDir}/src/Compilers/CSharp/Portable", "*.cs", SearchOption.AllDirectories)
-        .Append($"{RoslynDir}/src/Compilers/CSharp/CSharpAnalyzerDriver/CSharpDeclarationComputer.cs")
+    List<string> files = Directory.GetFiles(BaseDir, "*.cs", SearchOption.AllDirectories)
         .ToList();
         
     List<MetadataReference> references = new[] 
     {
-        $"{RoslynDir}/Binaries/Debug/Dlls/CodeAnalysis/ref/Microsoft.CodeAnalysis.dll",
         $"{UserDir}/.nuget/packages/system.collections.concurrent/4.3.0/ref/netstandard1.3/System.Collections.Concurrent.dll",
         $"{UserDir}/.nuget/packages/system.collections/4.3.0/ref/netstandard1.3/System.Collections.dll",
         $"{UserDir}/.nuget/packages/system.collections.immutable/1.3.1/lib/netstandard1.0/System.Collections.Immutable.dll",
@@ -60,6 +58,7 @@ public class Program
         $"{UserDir}/.nuget/packages/system.threading/4.3.0/ref/netstandard1.3/System.Threading.dll",
         $"{UserDir}/.nuget/packages/system.threading.tasks/4.3.0/ref/netstandard1.3/System.Threading.Tasks.dll",
         $"{UserDir}/.nuget/packages/system.threading.tasks.parallel/4.3.0/ref/netstandard1.1/System.Threading.Tasks.Parallel.dll",
+        $"{UserDir}/.nuget/packages/system.threading.timer/4.3.0/ref/netstandard1.2/System.Threading.Timer.dll",
         $"{UserDir}/.nuget/packages/system.valuetuple/4.3.0/lib/netstandard1.0/System.ValueTuple.dll",
         $"{UserDir}/.nuget/packages/system.xml.readerwriter/4.3.0/ref/netstandard1.3/System.Xml.ReaderWriter.dll",
         $"{UserDir}/.nuget/packages/system.xml.xdocument/4.3.0/ref/netstandard1.3/System.Xml.XDocument.dll",
@@ -74,20 +73,22 @@ public class Program
         {
             using (var stream = File.OpenRead(f))
             {
-                return SyntaxFactory.ParseSyntaxTree(SourceText.From(stream), new CSharpParseOptions(LanguageVersion.Latest, documentationMode, preprocessorSymbols: new[] { "NETSTANDARD1_3" }));
+                return SyntaxFactory.ParseSyntaxTree(
+                    SourceText.From(stream), new CSharpParseOptions(LanguageVersion.Latest, documentationMode,
+                    preprocessorSymbols: new[] { "NETSTANDARD1_3" }), path: f.Substring(BaseDir.Length + 1));
             }
         }).ToList();
 
         return CSharpCompilation.Create(
-            "Microsoft.CodeAnalysis.CSharp", trees, references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, cryptoKeyFile: $"{RoslynDir}/build/Targets/../Strong Name Keys/35MSSharedLib1024.snk", publicSign: true));
+            null, trees, references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
     }
 
     [Params(EmitMode.None, EmitMode.Null, EmitMode.NullStream)]
-    public EmitMode EmitMode { get; set; }
+    public EmitMode EmitMode { get; set; } = EmitMode.NullStream;
 
     [Params(DocumentationMode.None, DocumentationMode.Parse, DocumentationMode.Diagnose)]
-    public DocumentationMode DocumentationMode { get; set; }
+    public DocumentationMode DocumentationMode { get; set; } = DocumentationMode.Parse;
 
     [Benchmark]
     public void Benchmark()
