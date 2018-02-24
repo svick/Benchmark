@@ -17,7 +17,7 @@ public class Program
     static void Main() => BenchmarkRunner.Run<Program>();
     //static void Main() => new Program().Benchmark();
 
-    const string RoslynDir = "C:/code/roslyn";
+    const string RoslynDir = "/home/svick/roslyn";
     static readonly string UserDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
     List<string> files = Directory.GetFiles($"{RoslynDir}/src/Compilers/CSharp/Portable", "*.cs", SearchOption.AllDirectories)
