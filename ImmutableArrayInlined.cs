@@ -99,11 +99,12 @@ namespace MyImmutableInlined
                 }
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Add(T item)
             {
-                this.EnsureCapacity(this.Count + 1);
-                _elements[_count++] = item;
+                var newCount = _count + 1;
+                this.EnsureCapacity(newCount);
+                _elements[_count] = item;
+                _count = newCount;
             }
 
             public void AddRange(T[] items, int length)
@@ -171,6 +172,30 @@ namespace MyImmutableInlined
                 }
             }
 
+            private static void ThrowIndexOutOfRangeException() => throw new IndexOutOfRangeException();
+
+            public T this[int index]
+            {
+                get
+                {
+                    if (index >= this.Count)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+
+                    return _elements[index];
+                }
+
+                set
+                {
+                    if (index >= this.Count)
+                    {
+                        ThrowIndexOutOfRangeException();
+                    }
+
+                    _elements[index] = value;
+                }
+            }
             private void EnsureCapacity(int capacity)
             {
                 if (_elements.Length < capacity)

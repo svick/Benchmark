@@ -169,6 +169,29 @@ namespace MyImmutable
                 }
             }
 
+            public T this[int index]
+            {
+                get
+                {
+                    if (index >= this.Count)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+
+                    return _elements[index];
+                }
+
+                set
+                {
+                    if (index >= this.Count)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+
+                    _elements[index] = value;
+                }
+            }            
+
             private void EnsureCapacity(int capacity)
             {
                 if (_elements.Length < capacity)
