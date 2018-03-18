@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace MyImmutable
 {
@@ -98,10 +99,45 @@ namespace MyImmutable
                 }
             }
 
-            public void Add(T item)
+            public void SimpleAdd(T item)
             {
                 this.EnsureCapacity(this.Count + 1);
                 _elements[_count++] = item;
+            }
+
+            public void TweakedAdd(T item)
+            {
+                int newCount = _count + 1;
+                this.EnsureCapacity(newCount);
+                _elements[_count] = item;
+                _count = newCount;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SplitAdd(T item)
+            {
+                int count = _count;
+                T[] elements = _elements;
+
+                if ((uint)count < (uint)elements.Length)
+                {
+                    elements[count] = item;
+                    _count = count + 1;
+                }
+                else
+                {
+                    AddWithResize(item);
+                }
+            }
+
+            // Improve code quality as uncommon path
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private void AddWithResize(T item)
+            {
+                int newCount = _count + 1;
+                this.EnsureCapacity(newCount);
+                _elements[_count] = item;
+                _count = newCount;
             }
 
             public void AddRange(T[] items, int length)
