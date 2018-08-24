@@ -2,13 +2,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <!-- <TargetFrameworks>net46;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1</TargetFrameworks> -->
+    <!-- <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks> -->
+    <LangVersion>7.3</LangVersion>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <!-- <RuntimeIdentifier>win10-x64</RuntimeIdentifier> -->
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.11" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.14" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.9.0" />
   </ItemGroup>
 </Project>
